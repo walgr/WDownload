@@ -15,17 +15,20 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.app.wpf.wdownloadtool.DownloadImpl.DownComplexInfo;
 import com.app.wpf.wdownloadtool.WDownloadTool;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity implements
-        View.OnClickListener,
-        WDownloadTool.WDownloadToolInformationListener,
-        WDownloadTool.WDownloadToolListener,
-        WDownloadTool.WDownloadToolResultListener {
+        View.OnClickListener {
 
     private ProgressBar mProgressBar;
-    private String downloadUrl = "http://img15.3lian.com/2015/f2/50/d/71.jpg";
+    private ArrayList<String> downloadList = new ArrayList<>();
+    private String downloadUrl = "http://image.tianjimedia.com/uploadImages/2012/010/8O496A2M2F2C.jpg";
+    private boolean isDownload;
+    private WDownloadTool wDownloadTool = new WDownloadTool();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +39,12 @@ public class MainActivity extends AppCompatActivity implements
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         assert button != null;
         button.setOnClickListener(this);
+
+        downloadList.add(downloadUrl);
+//        downloadList.add(downloadUrl);
+//        downloadList.add(downloadUrl);
+//        downloadList.add(downloadUrl);
+//        downloadList.add(downloadUrl);
     }
 
     @Override
@@ -57,43 +66,48 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void download() {
-        new WDownloadTool()
-                .setWDownloadToolInformationListener(this)
-                .setWDownloadToolListener(this)
-                .setWDownloadToolResultListener(this)
-                .setOpenSpeedCheck(true)
-                .setFilePath(Environment.getExternalStorageDirectory()+"/Test/")
-                .setFileName("1.jpg")
-                .download(downloadUrl);
-    }
+        if (!isDownload) {
+            isDownload = true;
+            int i = 0;
+            String filePath = Environment.getExternalStorageDirectory().getPath() + "/Download/";
+            for (String url : downloadList) {
+                wDownloadTool.download(url, filePath, i + ".jpg", new DownComplexInfo() {
 
-    @Override
-    public void DownloadInformation(String name, int size) {
-        //mProgressBar.setMax(size);
-    }
+                    @Override
+                    public void downloadPercent(int percent) {
+                        mProgressBar.setProgress(percent);
+                    }
 
-    @Override
-    public void DownloadPercent(int percent) {
-        mProgressBar.setProgress(percent);
-    }
+                    @Override
+                    public void downloadDetailed(int downSize) {
 
-    @Override
-    public void DownloadSpeed(double speed) {
-        Log.e("速度",speed+"");
-    }
+                    }
 
-    @Override
-    public void DownloadDetailed(int downSize) {
+                    @Override
+                    public void downloadSpeed(double speed) {
+                        Log.e("速度", speed + "");
+                    }
 
-    }
+                    @Override
+                    public void downloadSuccess() {
+                        Log.d("结果", "下载成功");
+                        Toast.makeText(MainActivity.this, "下载成功", Toast.LENGTH_LONG).show();
+                        isDownload = false;
+                        mProgressBar.setProgress(0);
+                    }
 
-    @Override
-    public void DownloadFailed(String msg) {
-        Toast.makeText(this,"下载失败--->" + msg,Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void DownloadSuccess() {
-        Toast.makeText(this,"下载成功",Toast.LENGTH_LONG).show();
+                    @Override
+                    public void downloadFailed(String msg) {
+                        Log.d("结果", "下载失败:" + msg);
+                        Toast.makeText(MainActivity.this, "下载失败:" + msg, Toast.LENGTH_LONG).show();
+                        isDownload = false;
+                        mProgressBar.setProgress(0);
+                    }
+                });
+                i++;
+            }
+        } else {
+            wDownloadTool.stop();
+        }
     }
 }

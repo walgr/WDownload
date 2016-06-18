@@ -1,9 +1,10 @@
-package com.app.wpf.wdownloadtool;
+package com.app.wpf.wdownloadtool.Thread;
 
 import android.os.Handler;
 
 import com.app.wpf.wdownloadtool.Tools.Check;
 import com.app.wpf.wdownloadtool.Tools.SendMessage;
+import com.app.wpf.wdownloadtool.WDownloadTool;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,12 +24,7 @@ public class DownloadThread extends Thread {
     private String downloadUrl;
     private int fileSize = 0;
     private String fileName,filePath;
-
     private Handler handler;
-
-    public DownloadThread() {
-
-    }
 
     @Override
     public void run() {

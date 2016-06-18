@@ -1,4 +1,4 @@
-package com.app.wpf.wdownloadtool;
+package com.app.wpf.wdownloadtool.Thread;
 
 import android.os.Handler;
 
@@ -33,19 +33,19 @@ public class GetFileInfoThread extends Thread {
             httpURLConnection = (HttpURLConnection) url.openConnection();
 //            httpURLConnection.setAllowUserInteraction(true);
             httpURLConnection.setConnectTimeout(3000);
-//            httpURLConnection.setRequestMethod("GET");
-//            httpURLConnection.setRequestProperty("User-Agent", "Net");
-//            httpURLConnection.setRequestProperty(
-//                    "Accept",
-//                    "image/gif, image/jpeg, image/pjpeg, image/pjpeg, "
-//                            + "application/x-shockwave-flash, application/xaml+xml, "
-//                            + "application/vnd.ms-xpsdocument, application/x-ms-xbap, "
-//                            + "application/x-ms-application, application/vnd.ms-excel, "
-//                            + "application/vnd.ms-powerpoint, application/msword, */*");
-//            httpURLConnection.setRequestProperty("Accept-Language", "zh-CN");
-//            httpURLConnection.setRequestProperty("Charset", "UTF-8");
+            httpURLConnection.setRequestMethod("GET");
+            httpURLConnection.setRequestProperty("User-Agent", "Net");
+            httpURLConnection.setRequestProperty(
+                    "Accept",
+                    "image/gif, image/jpeg, image/pjpeg, image/pjpeg, "
+                            + "application/x-shockwave-flash, application/xaml+xml, "
+                            + "application/vnd.ms-xpsdocument, application/x-ms-xbap, "
+                            + "application/x-ms-application, application/vnd.ms-excel, "
+                            + "application/vnd.ms-powerpoint, application/msword, */*");
+            httpURLConnection.setRequestProperty("Accept-Language", "zh-CN");
+            httpURLConnection.setRequestProperty("Charset", "UTF-8");
             int fileSize = httpURLConnection.getContentLength();
-            SendMessage.send(handler, 0x03, "", fileSize, 0);
+            SendMessage.send(handler, 0x03, httpURLConnection.getURL().getFile(), fileSize, 0);
         } catch (SocketTimeoutException e) {
             e.printStackTrace();
             SendMessage.send(handler,0x01,e.getMessage(),0,0);
