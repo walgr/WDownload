@@ -138,20 +138,27 @@ public class WDownloadTool {
 
     public void stop() {
         for(DownloadThread downloadThread : downloadThreads) {
-            if(downloadThread.isAlive())
+            if(downloadThread != null && downloadThread.isAlive()) {
                 downloadThread.interrupt();
+                downloadThread.setStop();
+            }
         }
+        if(downSimpleInfo != null) downSimpleInfo.downloadFailed("用户停止");
+        if(downComplexInfo != null) downComplexInfo.downloadFailed("用户停止");
     }
 
     public void pause() {
         for(DownloadThread downloadThread : downloadThreads) {
-            if(downloadThread.isAlive())
+            if(downloadThread != null && downloadThread.isAlive())
                 try {
+                    downloadThread.setStop();
                     downloadThread.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
         }
+        if(downSimpleInfo != null) downSimpleInfo.downloadFailed("用户暂停");
+        if(downComplexInfo != null) downComplexInfo.downloadFailed("用户暂停");
     }
 
     public WDownloadTool setFilePath(String filePath) {

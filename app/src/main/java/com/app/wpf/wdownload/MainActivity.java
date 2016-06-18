@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private ProgressBar mProgressBar;
     private ArrayList<String> downloadList = new ArrayList<>();
-    private String downloadUrl = "http://image.tianjimedia.com/uploadImages/2012/010/8O496A2M2F2C.jpg";
+    private String downloadUrl = "https://dl.google.com/dl/android/studio/ide-zips/2.2.0.2/android-studio-ide-145.2949926-windows.zip";
     private boolean isDownload;
     private WDownloadTool wDownloadTool = new WDownloadTool();
 
@@ -70,8 +70,7 @@ public class MainActivity extends AppCompatActivity implements
             isDownload = true;
             int i = 0;
             String filePath = Environment.getExternalStorageDirectory().getPath() + "/Download/";
-            for (String url : downloadList) {
-                wDownloadTool.download(url, filePath, i + ".jpg", new DownComplexInfo() {
+            wDownloadTool.download(downloadUrl, filePath, i + ".jpg", new DownComplexInfo() {
 
                     @Override
                     public void downloadPercent(int percent) {
@@ -105,9 +104,10 @@ public class MainActivity extends AppCompatActivity implements
                     }
                 });
                 i++;
-            }
         } else {
             wDownloadTool.stop();
+            mProgressBar.setProgress(0);
+            wDownloadTool = new WDownloadTool();
         }
     }
 }

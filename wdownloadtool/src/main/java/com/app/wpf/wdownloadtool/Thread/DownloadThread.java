@@ -25,6 +25,7 @@ public class DownloadThread extends Thread {
     private int fileSize = 0;
     private String fileName,filePath;
     private Handler handler;
+    private boolean stop;
 
     @Override
     public void run() {
@@ -43,7 +44,7 @@ public class DownloadThread extends Thread {
             RandomAccessFile fos = new RandomAccessFile (filePath + fileName,"rw");
             fos.seek(downloadPosition);
             byte[] buf = new byte[1024];
-            while ((len = is.read(buf)) > 0) {
+            while (!stop && (len = is.read(buf)) > 0) {
                 SendMessage.send(handler,0x04,"",len,0);
                 fos.write(buf, 0, len);
             }
@@ -105,6 +106,11 @@ public class DownloadThread extends Thread {
 
     public DownloadThread setFileName(String fileName) {
         this.fileName = fileName;
+        return this;
+    }
+
+    public DownloadThread setStop() {
+        this.stop = true;
         return this;
     }
 }
