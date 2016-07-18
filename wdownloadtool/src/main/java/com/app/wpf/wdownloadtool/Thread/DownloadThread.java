@@ -3,6 +3,7 @@ package com.app.wpf.wdownloadtool.Thread;
 import android.os.Handler;
 
 import com.app.wpf.wdownloadtool.Tools.Check;
+import com.app.wpf.wdownloadtool.Tools.DownloadInfo;
 import com.app.wpf.wdownloadtool.Tools.SendMessage;
 import com.app.wpf.wdownloadtool.WDownloadTool;
 
@@ -20,9 +21,10 @@ import java.net.URL;
 
 public class DownloadThread extends Thread {
 
+    private DownloadInfo.ThreadDownloadInfo threadDownloadInfo;
     private int threadID = 0;
     private String downloadUrl;
-    private int fileSize = 0;
+    private long fileSize = 0,downSize = 0;
     private String fileName,filePath;
     private Handler handler;
     private boolean stop;
@@ -35,17 +37,22 @@ public class DownloadThread extends Thread {
         try {
             URL url = new URL(downloadUrl);
             httpURLConnection = (HttpURLConnection) url.openConnection();
-            httpURLConnection.setConnectTimeout(3000);
-            int downloadPosition = downloadPosition(fileSize);
-            int len,downloadSize = downloadSize(fileSize);
-            httpURLConnection.setRequestProperty("range", "bytes=" + downloadPosition + "-" + (downloadPosition+downloadSize));
+            httpURLConnection.setConnectTimeout(5000);
+            long downloadStartPosition = downloadStartPosition(fileSize);
+            long downloadSize = downloadSize(fileSize);
+            httpURLConnection.setRequestProperty("range", "bytes="
+                    + downloadStartPosition + "-" + (downloadStartPosition + downloadSize -1));
             httpURLConnection.connect();
             InputStream is = httpURLConnection.getInputStream();
             RandomAccessFile fos = new RandomAccessFile (filePath + fileName,"rw");
-            fos.seek(downloadPosition);
+            fos.seek(downloadStartPosition);
             byte[] buf = new byte[1024];
+            int len;
             while (!stop && (len = is.read(buf)) > 0) {
-                SendMessage.send(handler,0x04,"",len,0);
+                downSize += len;
+                threadDownloadInfo.downSize += len;
+                threadDownloadInfo.curPosition = downloadStartPosition + downSize;
+                SendMessage.send(handler,0x04,"",len,threadID);
                 fos.write(buf, 0, len);
             }
             is.close();
@@ -61,21 +68,26 @@ public class DownloadThread extends Thread {
         httpURLConnection.disconnect();
     }
 
-    private int downloadPosition(int fileSize) {
-        int pos;
-        int averageSize = fileSize / WDownloadTool.threadNum;
-        pos = averageSize * threadID;
+    private long downloadStartPosition(long fileSize) {
+        long pos;
+        if(threadDownloadInfo.curPosition != 0) {
+            pos = threadDownloadInfo.curPosition;
+        } else {
+            long averageSize = fileSize / WDownloadTool.threadNum;
+            pos = averageSize * threadID;
+        }
         return pos;
     }
 
-    private int downloadSize(int fileSize) {
-        int downloadSize;
-        int averageSize = fileSize / WDownloadTool.threadNum;
+    private long downloadSize(long fileSize) {
+        long shouldDownloadSize ;
+        long averageSize = fileSize / WDownloadTool.threadNum;
         if(threadID < WDownloadTool.threadNum - 1)
-           downloadSize = averageSize;
+            shouldDownloadSize = averageSize;
         else
-            downloadSize = fileSize - (WDownloadTool.threadNum - 1) * averageSize;
-        return downloadSize;
+            shouldDownloadSize = fileSize - (WDownloadTool.threadNum - 1) * averageSize;
+        shouldDownloadSize -= threadDownloadInfo.downSize;
+        return shouldDownloadSize;
     }
 
     public DownloadThread setThreadID(int threadID) {
@@ -93,7 +105,7 @@ public class DownloadThread extends Thread {
         return this;
     }
 
-    public DownloadThread setFileSize(int fileSize) {
+    public DownloadThread setFileSize(long fileSize) {
         this.fileSize = fileSize;
         return this;
     }
@@ -112,5 +124,13 @@ public class DownloadThread extends Thread {
     public DownloadThread setStop() {
         this.stop = true;
         return this;
+    }
+
+    public long getDownloadSize() {
+        return downSize;
+    }
+
+    public void setThreadDownloadInfo(DownloadInfo.ThreadDownloadInfo threadDownloadInfo) {
+        this.threadDownloadInfo = threadDownloadInfo;
     }
 }

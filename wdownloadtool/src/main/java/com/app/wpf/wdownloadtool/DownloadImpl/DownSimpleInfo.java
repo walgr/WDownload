@@ -7,4 +7,5 @@ package com.app.wpf.wdownloadtool.DownloadImpl;
 
 public abstract class DownSimpleInfo extends WDownloadToolResult {
 //    public abstract void fileInfo(String name, int size);
+    public abstract void downloadPercent(int percent);
 }

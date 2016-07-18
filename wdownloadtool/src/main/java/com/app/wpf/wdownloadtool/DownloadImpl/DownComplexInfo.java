@@ -7,6 +7,6 @@ package com.app.wpf.wdownloadtool.DownloadImpl;
 
 public abstract class DownComplexInfo extends WDownloadToolResult {
     public abstract void downloadPercent(int percent);
-    public abstract void downloadDetailed(int downSize);
+    public abstract void downloadDetailed(long downSize);
     public abstract void downloadSpeed(double speed);
 }

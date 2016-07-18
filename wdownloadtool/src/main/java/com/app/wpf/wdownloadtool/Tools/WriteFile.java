@@ -11,7 +11,7 @@ import java.io.InputStream;
 public class WriteFile {
 
     public static boolean Write(InputStream is, String filePath, String fileName) throws IOException {
-        if (!fileName.isEmpty()) {
+        if (!filePath.isEmpty() && !fileName.isEmpty()) {
             FileOutputStream fos = new FileOutputStream(filePath + fileName);
             byte[] buff = new byte[1024];
             int len;
@@ -25,10 +25,14 @@ public class WriteFile {
         return false;
     }
 
-    public static boolean WriteByByte(int byteOffset,byte[] data,String filePath,String fileName) throws IOException {
+    public static boolean WriteString(String string, String filePath, String fileName) throws IOException {
+        return WriteByByte(string.getBytes(),filePath,fileName);
+    }
+
+    public static boolean WriteByByte(byte[] data,String filePath,String fileName) throws IOException {
         if(data != null && data.length != 0) {
-            if (!fileName.isEmpty()) {
-                FileOutputStream out = new FileOutputStream(filePath + fileName,true);
+            if (!filePath.isEmpty() && !fileName.isEmpty()) {
+                FileOutputStream out = new FileOutputStream(filePath + fileName,false);
                 out.write(data);
                 out.flush();
                 out.close();
@@ -37,5 +41,4 @@ public class WriteFile {
         }
         return false;
     }
-
 }
