@@ -4,7 +4,7 @@ android {
     compileSdkVersion 24
     buildToolsVersion '24.0.0'
     defaultConfig {
-        applicationId "com.app.wpf.wdownload"
+        applicationId "com.wpf.wdownload"
         minSdkVersion 17
         targetSdkVersion 24
         versionCode 1

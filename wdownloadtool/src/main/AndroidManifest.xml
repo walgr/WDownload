@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.app.wpf.wdownloadtool">
+    package="com.wpf.wdownloadtool">
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
